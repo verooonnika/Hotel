@@ -12,33 +12,35 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static by.epam.khlopava.hotel.constant.PageConstant.BOOKINGS_PAGE;
-import static by.epam.khlopava.hotel.constant.PageConstant.USER_MAIN_PAGE;
+import static by.epam.khlopava.hotel.constant.PageConstant.*;
 import static by.epam.khlopava.hotel.constant.RequestConstant.*;
+import static by.epam.khlopava.hotel.constant.RequestConstant.BOOKINGS;
 
-public class ShowBookingsCommand implements Command {
+public class BookingDetailCommand implements Command {
 
     private static Logger log = LogManager.getLogger();
 
+
     private CommonService commonService;
 
-    public ShowBookingsCommand(CommonService commonService) {
+    public BookingDetailCommand(CommonService commonService) {
         this.commonService = commonService;
     }
 
     @Override
     public CommandResult execute(RequestContent requestContent) {
         CommandResult commandResult;
-        User user = (User) requestContent.getSessionAttribute(USER);
+        int bookingId = Integer.parseInt(requestContent.getRequestParameter(BOOKING_ID)[0]);
         Map<String, Object> requestAttributes = new HashMap<>();
         try {
-            List<Booking> bookingList = commonService.findBookings(user.getLogin());
+            List<Booking> bookingList = commonService.findBookingById(bookingId);
             if (bookingList.isEmpty()) {
                 requestAttributes.put(ERROR_FINDING_BOOKINGS, MessageHandler.getMessage("message.no_bookings", (String) requestContent.getSessionAttribute(LOCALE)));
-                commandResult = new CommandResult(CommandResult.ResponseType.FORWARD, USER_MAIN_PAGE, requestAttributes);
-            } else {
-                requestAttributes.put(BOOKINGS, bookingList);
                 commandResult = new CommandResult(CommandResult.ResponseType.FORWARD, BOOKINGS_PAGE, requestAttributes);
+            } else {
+                Booking booking = bookingList.get(0);
+                requestAttributes.put(BOOKING, booking);
+                commandResult = new CommandResult(CommandResult.ResponseType.FORWARD, BOOKING_DETAIL_PAGE, requestAttributes);
             }
             return commandResult;
         } catch (ServiceException e) {

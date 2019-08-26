@@ -1,6 +1,6 @@
 package by.epam.khlopava.hotel.command;
 
-import by.epam.khlopava.hotel.command.constant.PageConstant;
+import by.epam.khlopava.hotel.constant.PageConstant;
 
 public class ToRegistrationCommand implements Command {
     @Override

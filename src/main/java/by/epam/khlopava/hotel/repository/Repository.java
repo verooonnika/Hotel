@@ -9,8 +9,8 @@ import java.util.List;
 public interface Repository< T extends Entity> {
 
     boolean add(T entity) throws RepositoryException;
-    boolean remove(T entity);
-    boolean update(T entity);
+    boolean remove(T entity) throws RepositoryException;
+    boolean update(T entity) throws RepositoryException;
 
     List<T> query(Specification specification) throws RepositoryException;
 

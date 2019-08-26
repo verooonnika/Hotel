@@ -21,12 +21,17 @@ public class UserRepository extends DbAbstractRepository<User> implements Reposi
 
     private static Logger log = LogManager.getLogger();
 
-    @Language("SQL")
+    @Language("MySQL")
     private static final String ADD_USER = "INSERT INTO user(login, password, email," +
             " first_name, last_name, phone_number, country, birthday, isAdmin) " +
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);";
 
-
+    @Language("MySQL")
+    private static final String UPDATE_USER =
+            "UPDATE user " +
+                    "SET login = ?, password = ?, email = ?, first_name = ?, last_name = ?, phone_number = ?, " +
+                    "country = ?, birthday = ?, isAdmin = ? " +
+                    "WHERE login = ?;";
     @Override
     public boolean add(User user) throws RepositoryException {
         PreparedStatement preparedStatement = null;
@@ -47,7 +52,7 @@ public class UserRepository extends DbAbstractRepository<User> implements Reposi
             log.debug(user + "was added successfully to database");
             return true;
         } catch (InterruptedException | SQLException e) {
-            // log
+            log.error("Can't add to UserRepository", e);
             throw new RepositoryException(e);
         } finally {
             closeStatement(preparedStatement);
@@ -56,13 +61,37 @@ public class UserRepository extends DbAbstractRepository<User> implements Reposi
     }
 
     @Override
-    public boolean remove(User entity) {
+    public boolean remove(User user) {
         return false;
     }
 
     @Override
-    public boolean update(User entity) {
-        return false;
+    public boolean update(User user) throws RepositoryException {
+        PreparedStatement preparedStatement = null;
+        try {
+            connection = ConnectionPool.getInstance().takeConnection();
+            preparedStatement = preparedStatement(UPDATE_USER);
+            preparedStatement.setString(1, user.getLogin());
+            preparedStatement.setString(2, user.getPassword());
+            preparedStatement.setString(3, user.getEmail());
+            preparedStatement.setString(4, user.getFirstName());
+            preparedStatement.setString(5, user.getLastName());
+            preparedStatement.setString(6, user.getPhoneNumber());
+            preparedStatement.setString(7, user.getCountry());
+            preparedStatement.setString(8, user.getBirthday().toString());
+            preparedStatement.setBoolean(9, user.isAdmin());
+            preparedStatement.setString(10, user.getLogin());
+            preparedStatement.executeUpdate();
+            log.debug(user + "was updated successfully");
+            return true;
+        } catch (InterruptedException | SQLException e) {
+            log.error("Can't update user", e);
+            throw new RepositoryException(e);
+        } finally {
+            closeStatement(preparedStatement);
+            closeConnection(connection);
+        }
+
     }
 
     @Override
@@ -90,7 +119,7 @@ public class UserRepository extends DbAbstractRepository<User> implements Reposi
                 users.add(user);
             }
         } catch (SQLException | InterruptedException e) {
-            //log
+            log.error("Error in execution query UserRepository", e);
             throw new RepositoryException(e);
         } finally {
             closeResultSet(resultSet);

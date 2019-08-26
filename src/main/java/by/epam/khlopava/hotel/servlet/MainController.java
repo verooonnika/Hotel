@@ -1,9 +1,8 @@
 package by.epam.khlopava.hotel.servlet;
 
-import by.epam.khlopava.hotel.command.Command;
-import by.epam.khlopava.hotel.command.CommandFactory;
-import by.epam.khlopava.hotel.command.CommandResult;
-import by.epam.khlopava.hotel.command.RequestContent;
+import by.epam.khlopava.hotel.command.*;
+import by.epam.khlopava.hotel.connection.ConnectionPool;
+import by.epam.khlopava.hotel.exception.ConnectionPoolException;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -36,11 +35,24 @@ public class MainController extends HttpServlet {
         commandResult.getAttributes().forEach(request::setAttribute);
         commandResult.getSessionAttributes().forEach(request.getSession()::setAttribute);
 
+        if (command.getClass().isAssignableFrom(LogoutCommand.class)) {
+            request.getSession().invalidate(); //session need to be invalidated if command is logout
+        }
+
         if (commandResult.getResponseType() == CommandResult.ResponseType.FORWARD) {
             RequestDispatcher requestDispatcher = getServletContext().getRequestDispatcher(commandResult.getPage());
             requestDispatcher.forward(request, response);
         } else {
             response.sendRedirect(request.getServletContext().getContextPath() + commandResult.getPage());
+        }
+    }
+
+    @Override
+    public void destroy(){
+        try {
+            ConnectionPool.getInstance().closePool();
+        } catch (ConnectionPoolException e) {
+            throw new RuntimeException("Cant destroy pool connection");
         }
     }
 }

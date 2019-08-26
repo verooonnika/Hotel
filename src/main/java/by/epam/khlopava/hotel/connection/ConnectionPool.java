@@ -91,8 +91,8 @@ public class ConnectionPool {
         for (int i = 0; i < connectionProperties.getDbPoolSize(); i++) {
             ProxyConnection proxyConnection = null;
             try {
-                proxyConnection.realClose();
                 proxyConnection = availableConnections.take();
+                proxyConnection.realClose();
             } catch (SQLException | InterruptedException e) {
                 throw new ConnectionPoolException(e);
             }

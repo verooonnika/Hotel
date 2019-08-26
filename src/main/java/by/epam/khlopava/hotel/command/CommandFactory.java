@@ -1,6 +1,6 @@
 package by.epam.khlopava.hotel.command;
 
-import static by.epam.khlopava.hotel.command.constant.RequestConstant.*;
+import static by.epam.khlopava.hotel.constant.RequestConstant.*;
 
 public class CommandFactory {
 

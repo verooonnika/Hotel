@@ -24,10 +24,13 @@ public class BookingRepository extends DbAbstractRepository<Booking> implements 
 
     private static Logger log = LogManager.getLogger();
 
-    @Language("SQL")
+    @Language("MySQL")
     private static final String ADD_BOOKING = "INSERT INTO booking(user_login, room_number," +
             " arrival_date, departure_date, number_of_guests, guests)" +
-            "VALUES (?,?,?,?,?,?)";
+            "VALUES (?,?,?,?,?,?);";
+
+    @Language("MySQL")
+    private static final String DELETE_BOOKING = "DELETE FROM booking WHERE booking.booking_id = ?";
 
     @Override
     public boolean add(Booking booking) throws RepositoryException {
@@ -44,18 +47,30 @@ public class BookingRepository extends DbAbstractRepository<Booking> implements 
             preparedStatement.executeUpdate();
             return true;
         } catch (InterruptedException | SQLException e) {
-            //log
+            log.error("Can't add to BookingRepository", e);
             throw new RepositoryException(e);
         } finally {
             closeStatement(preparedStatement);
             closeConnection(connection);
         }
-
     }
 
     @Override
-    public boolean remove(Booking entity) {
-        return false;
+    public boolean remove(Booking booking) throws RepositoryException {
+        PreparedStatement preparedStatement = null;
+        try {
+            connection = ConnectionPool.getInstance().takeConnection();
+            preparedStatement = preparedStatement(DELETE_BOOKING);
+            preparedStatement.setInt(1, booking.getBookingId());
+            preparedStatement.executeUpdate();
+            return true;
+        } catch (InterruptedException | SQLException e) {
+            log.error("Can't remove from Booking repository", e);
+            throw new RepositoryException(e);
+        } finally {
+            closeStatement(preparedStatement);
+            closeConnection(connection);
+        }
     }
 
     @Override
@@ -94,7 +109,6 @@ public class BookingRepository extends DbAbstractRepository<Booking> implements 
                 bookings.add(booking);
                 log.debug("Query to database executed successfully");
             }
-            System.out.println(bookings.size()); //todo delete
         } catch (InterruptedException | SQLException e) {
             log.error("Error in execution query BookingRepository");
             throw new RepositoryException(e);
