@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
-<c:set var="page" value="/jsp/registration.jsp" scope="request"/>
+<c:set var="page" value="/jsp/common/registration.jsp" scope="request"/>
 <fmt:setLocale value="${not empty sessionScope.locale ? sessionScope.locale : pageContext.request.locale}"
                scope="session"/>
 <fmt:setBundle basename="messages"/>
@@ -10,6 +10,12 @@
     <title><fmt:message key="title.register"/></title>
 </head>
 <body>
+<div>
+    <c:import url="language-form.jsp"/>
+</div>
+<div>
+    <c:import url="header.jsp"/>
+</div>
 <div>
 
     <!-- Registration form -->
@@ -31,11 +37,11 @@
                placeholder="<fmt:message key = "placeholder.password"/>"/>
 
         <label for="emailField"><fmt:message key="label.email"/></label>
-        <input type="text"
+        <input type="email"
                name="email"
                value=""
+               pattern="[-0-9a-zA-Z.+_]{2,64}+@[-0-9a-zA-Z.+_]+\.[a-zA-Z]{2,4}"
                id="emailField"
-               pattern="^[(\w)-]{4,20}"
                required=""/>
 
         <label for="firstNameField"><fmt:message key="label.first_name"/></label>
@@ -43,7 +49,7 @@
                name="first-name"
                value=""
                id="firstNameField"
-               pattern="^[(\w)-]{4,20}"
+               pattern="[A-Za-zА-Яа-яЁё]{3,30}"
                required=""/>
 
         <label for="lastNameField"><fmt:message key="label.last_name"/></label>
@@ -51,7 +57,7 @@
                name="last-name"
                value=""
                id="lastNameField"
-               pattern="^[(\w)-]{4,20}"
+               pattern="[A-Za-zА-Яа-яЁё]{3,30}"
                required=""/>
 
         <label for="phoneNumberField"><fmt:message key="label.phone_number"/></label>
@@ -59,7 +65,7 @@
                name="phone-number"
                value=""
                id="phoneNumberField"
-               pattern="^[(\w)-]{4,20}"
+               pattern="[0-9]{7,20}"
                required=""/>
 
         <label for="countryField"><fmt:message key="label.country"/></label>
@@ -67,15 +73,15 @@
                name="country"
                value=""
                id="countryField"
-               pattern="^[(\w)-]{4,20}"
+               pattern="^[(\w)-]{4,25}"
                required=""/>
 
         <label for="birthdayField"><fmt:message key="label.birthday"/></label>
-        <input type="text"
+        <input type="date"
                name="birthday"
                value=""
                id="birthdayField"
-               pattern="^[(\w)-/]{4,20}"
+               min="1920-01-01"
                required=""/>
 
         <input type="submit" value="<fmt:message key="button.register"/> ">

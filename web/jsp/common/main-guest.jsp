@@ -10,6 +10,13 @@
 </head>
 <body>
 <div>
+    <c:import url="language-form.jsp"/>
+</div>
+<div>
+    <c:import url="header.jsp"/>
+</div>
+
+<div>
     <!-- Login -->
     <form action="<c:url value="/controller"/>" method="get">
         <input type="hidden" name="command" value="to-login">
